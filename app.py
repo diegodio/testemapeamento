@@ -1,7 +1,10 @@
+```python
 import streamlit as st
 import os
 import json
 import base64
+from PIL import Image
+from io import BytesIO
 
 st.set_page_config(
     page_title="Mapeamento",
@@ -15,17 +18,17 @@ st.set_page_config(
 st.markdown("""
 <style>
 
-/* Menos margens */
+/* Container */
 .block-container{
-    padding-top:0.5rem;
-    padding-left:0.3rem;
-    padding-right:0.3rem;
+    padding-top:0.3rem;
+    padding-left:0.2rem;
+    padding-right:0.2rem;
     max-width:100%;
 }
 
-/* Força 5 colunas */
+/* Menos espaço entre colunas */
 [data-testid="stHorizontalBlock"]{
-    gap:0.2rem !important;
+    gap:0.15rem !important;
 }
 
 [data-testid="column"]{
@@ -34,39 +37,40 @@ st.markdown("""
 
 /* Imagens */
 [data-testid="stImage"] img{
-    aspect-ratio:1/1;
-    object-fit:cover;
+    width:100% !important;
+    height:auto !important;
+    object-fit:contain !important;
     border-radius:6px;
 }
 
 /* Texto */
 .aluno-info{
     text-align:center;
-    line-height:1.1;
-    margin-top:2px;
-    margin-bottom:2px;
+    line-height:1;
+    margin-top:1px;
+    margin-bottom:1px;
 }
 
 /* Botões */
 .stButton > button{
     width:100%;
+    padding:0 !important;
 }
 
 /* Celular */
 @media (max-width:768px){
 
     [data-testid="stImage"] img{
-        max-height:65px !important;
+        max-height:55px !important;
     }
 
     .aluno-info{
-        font-size:8px;
+        font-size:7px !important;
     }
 
     .stButton > button{
-        font-size:8px !important;
-        min-height:22px !important;
-        padding:0 !important;
+        min-height:18px !important;
+        font-size:7px !important;
     }
 }
 
@@ -74,11 +78,16 @@ st.markdown("""
 @media (min-width:769px){
 
     [data-testid="stImage"] img{
-        max-height:130px !important;
+        max-height:110px !important;
     }
 
     .aluno-info{
-        font-size:11px;
+        font-size:10px !important;
+    }
+
+    .stButton > button{
+        min-height:24px !important;
+        font-size:10px !important;
     }
 }
 
@@ -114,19 +123,37 @@ def load_data(turno, turma):
 
         if ext.lower() in [".jpg", ".jpeg", ".png"] and nome.isdigit():
 
-            with open(os.path.join(path, file), "rb") as f:
-                img_b64 = base64.b64encode(f.read()).decode()
+            try:
 
-            students.append(
-                {
-                    "numero": nome,
-                    "nome": name_map.get(nome, "---"),
-                    "img": img_b64
-                }
-            )
+                with Image.open(os.path.join(path, file)) as img:
 
-    return sorted(students, key=lambda x: int(x["numero"]))
+                    img = img.convert("RGB")
 
+                    # Redimensiona mantendo proporção
+                    img.thumbnail((120, 120))
+
+                    buffer = BytesIO()
+                    img.save(buffer, format="JPEG", quality=85)
+
+                    img_b64 = base64.b64encode(
+                        buffer.getvalue()
+                    ).decode()
+
+                students.append(
+                    {
+                        "numero": nome,
+                        "nome": name_map.get(nome, "---"),
+                        "img": img_b64
+                    }
+                )
+
+            except Exception:
+                pass
+
+    return sorted(
+        students,
+        key=lambda x: int(x["numero"])
+    )
 
 # =====================================================
 # SESSION STATE
@@ -136,7 +163,6 @@ if "swap" not in st.session_state:
 
 if "data" not in st.session_state:
     st.session_state.data = []
-
 
 # =====================================================
 # SIDEBAR
@@ -166,7 +192,6 @@ if turno:
         st.session_state.swap = None
         st.rerun()
 
-
 # =====================================================
 # TELA PRINCIPAL
 # =====================================================
@@ -189,7 +214,7 @@ if st.session_state.data:
             with cols[idx_col]:
 
                 st.image(
-                    f"data:image/png;base64,{aluno['img']}",
+                    f"data:image/jpeg;base64,{aluno['img']}",
                     use_container_width=True
                 )
 
@@ -240,3 +265,4 @@ else:
     st.info(
         "Selecione um turno e uma turma na barra lateral."
     )
+```
