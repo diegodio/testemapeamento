@@ -3,187 +3,108 @@ import os
 import json
 from PIL import Image
 
-# Configuração da página com a barra lateral fechada (collapsed)
-st.set_page_config(
-    page_title="Mapeamento - Colégio Prof. Newton Guimarães", 
-    layout="wide", 
-    initial_sidebar_state="collapsed"
-)
+# Configuração da página
+st.set_page_config(page_title="Mapeamento Interativo", layout="wide", initial_sidebar_state="collapsed")
 
-# CSS Avançado para Grid Responsivo e Detecção de Dispositivo
+# CSS para o Grid Responsivo e feedback visual
 st.markdown('''
 <style>
-/* Container do Grid de Alunos */
-.classroom-grid {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr); /* Força 5 colunas sempre */
-    gap: 10px;
-    width: 100%;
-    margin-bottom: 40px;
-}
-
-/* Card do Aluno */
-.student-card {
-    background-color: #ffffff;
-    border: 1px solid #e0e0e0;
-    border-radius: 8px;
-    padding: 5px;
-    text-align: center;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-}
-
-.student-number {
-    font-weight: 800;
-    color: #ff4b4b;
-    font-size: 0.9rem;
-}
-
-.student-name {
-    font-size: 0.8rem;
-    color: #31333F;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    font-weight: 500;
-}
-
-/* Imagem Adaptável */
-.student-img {
-    width: 100%;
-    aspect-ratio: 1/1;
-    object-fit: cover;
-    border-radius: 4px;
-    margin-bottom: 5px;
-}
-
-/* Estruturas da Sala (Mesa e Porta) */
-.room-footer {
-    display: flex;
-    justify-content: space-between;
-    gap: 20px;
-    margin-top: 20px;
-    width: 100%;
-}
-
-.footer-item {
-    padding: 15px;
-    border-radius: 8px;
-    text-align: center;
-    font-weight: bold;
-    color: white;
-    flex-grow: 1;
-}
-
-.teacher-desk {
-    background: linear-gradient(135deg, #4b6cb7 0%, #182848 100%);
-}
-
-.door {
-    background: linear-gradient(135deg, #8B4513 0%, #5C2E0B 100%);
-    max-width: 200px;
-}
-
-/* Ajustes específicos para dispositivos móveis (Telas menores que 768px) */
-@media (max-width: 768px) {
-    .classroom-grid {
-        gap: 5px; /* Menos espaço entre as carteiras no telemóvel */
-    }
-    .student-name {
-        font-size: 0.6rem; /* Nome menor para caber no ecrã */
-    }
-    .student-number {
-        font-size: 0.7rem;
-    }
-    .student-card {
-        padding: 2px;
-    }
-}
+.classroom-grid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin-bottom: 30px; }
+.student-card { background: #ffffff; border: 2px solid #e0e0e0; border-radius: 10px; padding: 10px; text-align: center; }
+.student-card.selected { border-color: #ff4b4b; background-color: #fff0f0; }
+.student-img { width: 100%; aspect-ratio: 1/1; object-fit: cover; border-radius: 5px; }
+.student-number { font-weight: 800; color: #ff4b4b; margin-top: 5px; }
+.student-name { font-size: 0.8rem; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.room-footer { display: flex; justify-content: space-between; gap: 20px; margin-top: 20px; }
 </style>
 ''', unsafe_allow_html=True)
 
-BASE_DIR = "turmas"
-
+# --- Funções de Carregamento ---
 def get_folders(path):
-    if not os.path.exists(path):
-        return []
+    if not os.path.exists(path): return []
     return [d for d in os.listdir(path) if os.path.isdir(os.path.join(path, d))]
 
-def get_image_as_base64(path):
-    import base64
-    with open(path, "rb") as img_file:
-        return base64.b64encode(img_file.read()).decode()
-
 def load_class_data(turno, turma):
-    path = os.path.join(BASE_DIR, turno, turma)
+    path = os.path.join("turmas", turno, turma)
     students = []
     json_path = None
-    if os.path.exists(path):
-        for file in os.listdir(path):
-            if file.endswith(".json"):
-                json_path = os.path.join(path, file)
-                break
-                
+    
+    # Procura arquivo JSON
+    for file in os.listdir(path):
+        if file.endswith(".json"):
+            json_path = os.path.join(path, file)
+            break
+            
     name_map = {}
     if json_path and os.path.exists(json_path):
         with open(json_path, 'r', encoding='utf-8') as f:
             name_map = json.load(f)
             
+    # Carrega imagens
     valid_exts = ['.jpg', '.jpeg', '.png', '.webp']
-    if os.path.exists(path):
-        for file in os.listdir(path):
-            name, ext = os.path.splitext(file)
-            if ext.lower() in valid_exts and name.isdigit():
-                num_chamada = name
-                student_name = name_map.get(num_chamada, "---")
-                students.append({
-                    "numero": int(num_chamada),
-                    "nome": student_name,
-                    "img_path": os.path.join(path, file)
-                })
+    for file in os.listdir(path):
+        name, ext = os.path.splitext(file)
+        if ext.lower() in valid_exts and name.isdigit():
+            students.append({
+                "numero": int(name),
+                "nome": name_map.get(name, "Desconhecido"),
+                "img_path": os.path.join(path, file)
+            })
     return sorted(students, key=lambda x: x['numero'])
 
-# --- BARRA LATERAL ---
-st.sidebar.title("🏫 Colégio Prof. Newton Guimarães")
-turnos = get_folders(BASE_DIR)
+# --- Inicialização ---
+if 'swap_selection' not in st.session_state:
+    st.session_state.swap_selection = None
 
-if not turnos:
-    st.error("Pasta 'turmas' não encontrada.")
-    st.stop()
-
+# --- Sidebar ---
+st.sidebar.title("🏫 Mapeamento")
+turnos = get_folders("turmas")
 turno_sel = st.sidebar.selectbox("Turno", turnos)
-turmas = get_folders(os.path.join(BASE_DIR, turno_sel))
 
-if turmas:
+if turno_sel:
+    turmas = get_folders(os.path.join("turmas", turno_sel))
     turma_sel = st.sidebar.selectbox("Turma", turmas)
     
-    # --- CONTEÚDO PRINCIPAL ---
-    st.title(f"📍 Sala: {turma_sel}")
-    
-    students = load_class_data(turno_sel, turma_sel)
-    
-    if not students:
-        st.info("Sem dados para esta turma.")
-    else:
-        # Iniciando o Grid de Alunos (Sempre 5 colunas via CSS)
-        # IMPORTANTE: A formatação abaixo não contém indentações para evitar bugs do Markdown
-        grid_html = '<div class="classroom-grid">\n'
-        
-        for s in students:
-            img_b64 = get_image_as_base64(s["img_path"])
-            grid_html += f'''<div class="student-card">
-<img src="data:image/png;base64,{img_b64}" class="student-img">
-<div class="student-number">Nº {s['numero']}</div>
-<div class="student-name" title="{s['nome']}">{s['nome']}</div>
-</div>\n'''
-        
-        grid_html += '</div>'
-        st.markdown(grid_html, unsafe_allow_html=True)
+    # Carregar dados se a turma mudou ou não existe
+    current_key = f"{turno_sel}_{turma_sel}"
+    if 'last_loaded' not in st.session_state or st.session_state.last_loaded != current_key:
+        st.session_state.turma_data = load_class_data(turno_sel, turma_sel)
+        st.session_state.last_loaded = current_key
+        st.session_state.swap_selection = None
 
-        # --- MESA E PORTA NO FINAL ---
-        st.markdown('''<div class="room-footer">
-<div class="footer-item door">🚪 PORTA</div>
-<div class="footer-item teacher-desk">👨‍🏫 MESA DO PROFESSOR</div>
-</div>''', unsafe_allow_html=True)
+    # --- Lógica de Troca ---
+    def process_swap(idx):
+        if st.session_state.swap_selection is None:
+            st.session_state.swap_selection = idx
+        else:
+            idx_a = st.session_state.swap_selection
+            idx_b = idx
+            data = st.session_state.turma_data
+            data[idx_a], data[idx_b] = data[idx_b], data[idx_a]
+            st.session_state.swap_selection = None
+            st.rerun()
 
-else:
-    st.sidebar.warning("Nenhuma turma encontrada.")
+    # --- Renderização ---
+    st.title(f"📍 Turma: {turma_sel}")
+    
+    grid_col = st.columns(5)
+    for i, student in enumerate(st.session_state.turma_data):
+        with grid_col[i % 5]:
+            is_selected = (st.session_state.swap_selection == i)
+            
+            st.markdown(f'<div class="student-card {"selected" if is_selected else ""}">', unsafe_allow_html=True)
+            st.image(student["img_path"], use_container_width=True)
+            st.markdown(f'''
+                <div class="student-number">Nº {student["numero"]}</div>
+                <div class="student-name">{student["nome"]}</div>
+            ''', unsafe_allow_html=True)
+            
+            btn_label = "Selecionado" if is_selected else "Trocar"
+            st.button(btn_label, key=f"btn_{i}", on_click=process_swap, args=(i,))
+            st.markdown('</div>', unsafe_allow_html=True)
+
+    # Footer
+    st.markdown('''<div class="room-footer">
+        <div style="background:#8B4513; color:white; padding:10px; border-radius:5px; flex:1; text-align:center">🚪 PORTA</div>
+        <div style="background:#182848; color:white; padding:10px; border-radius:5px; flex:1; text-align:center">👨‍🏫 MESA PROFESSOR</div>
+    </div>''', unsafe_allow_html=True)
