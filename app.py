@@ -9,129 +9,86 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
+# =====================================================
+# CSS
+# =====================================================
 st.markdown("""
 <style>
 
-/* Remove margens */
+/* Menos margens */
 .block-container{
-    padding-top:0.3rem;
-    padding-left:0.2rem;
-    padding-right:0.2rem;
+    padding-top:0.5rem;
+    padding-left:0.3rem;
+    padding-right:0.3rem;
     max-width:100%;
 }
 
-/* força 5 colunas */
+/* Força 5 colunas */
 [data-testid="stHorizontalBlock"]{
-    gap:2px !important;
+    gap:0.2rem !important;
 }
 
 [data-testid="column"]{
     padding:0 !important;
 }
 
-/* card */
-.student-card{
-    text-align:center;
-    padding:0;
-    margin:0;
-}
-
-.photo-container{
-    position:relative;
-}
-
-.student-photo{
-    width:100%;
+/* Imagens */
+[data-testid="stImage"] img{
     aspect-ratio:1/1;
     object-fit:cover;
-    border-radius:4px;
-    border:1px solid #ddd;
-    display:block;
+    border-radius:6px;
 }
 
-.student-number{
-    position:absolute;
-    top:1px;
-    left:1px;
-
-    background:rgba(0,0,0,0.75);
-    color:white;
-
-    font-size:7px;
-    padding:0px 3px;
-    border-radius:2px;
+/* Texto */
+.aluno-info{
+    text-align:center;
+    line-height:1.1;
+    margin-top:2px;
+    margin-bottom:2px;
 }
 
-.student-name{
-    font-size:7px;
-    line-height:1;
-    margin-top:1px;
-
-    white-space:nowrap;
-    overflow:hidden;
-    text-overflow:ellipsis;
-}
-
-/* botão */
+/* Botões */
 .stButton > button{
     width:100%;
-    height:18px !important;
-    min-height:18px !important;
-
-    padding:0 !important;
-    margin-top:1px !important;
-
-    font-size:8px !important;
 }
 
-/* celular */
+/* Celular */
 @media (max-width:768px){
 
-    .student-photo{
-        max-height:58px;
+    [data-testid="stImage"] img{
+        max-height:65px !important;
     }
 
-    .student-name{
-        font-size:6px;
-    }
-
-    .student-number{
-        font-size:6px;
+    .aluno-info{
+        font-size:8px;
     }
 
     .stButton > button{
-        height:16px !important;
-        min-height:16px !important;
-        font-size:7px !important;
+        font-size:8px !important;
+        min-height:22px !important;
+        padding:0 !important;
     }
 }
 
-/* desktop */
+/* Desktop */
 @media (min-width:769px){
 
-    .student-photo{
-        max-height:120px;
+    [data-testid="stImage"] img{
+        max-height:130px !important;
     }
 
-    .student-name{
-        font-size:10px;
-    }
-
-    .student-number{
-        font-size:9px;
+    .aluno-info{
+        font-size:11px;
     }
 }
 
 </style>
 """, unsafe_allow_html=True)
 
-
 # =====================================================
 # FUNÇÕES
 # =====================================================
-
 def load_data(turno, turma):
-
     path = os.path.join("turmas", turno, turma)
 
     json_path = next(
@@ -160,19 +117,20 @@ def load_data(turno, turma):
             with open(os.path.join(path, file), "rb") as f:
                 img_b64 = base64.b64encode(f.read()).decode()
 
-            students.append({
-                "numero": nome,
-                "nome": name_map.get(nome, "---"),
-                "img": img_b64
-            })
+            students.append(
+                {
+                    "numero": nome,
+                    "nome": name_map.get(nome, "---"),
+                    "img": img_b64
+                }
+            )
 
     return sorted(students, key=lambda x: int(x["numero"]))
 
 
 # =====================================================
-# SESSION
+# SESSION STATE
 # =====================================================
-
 if "swap" not in st.session_state:
     st.session_state.swap = None
 
@@ -183,7 +141,6 @@ if "data" not in st.session_state:
 # =====================================================
 # SIDEBAR
 # =====================================================
-
 turnos = []
 
 if os.path.exists("turmas"):
@@ -211,9 +168,8 @@ if turno:
 
 
 # =====================================================
-# GRID
+# TELA PRINCIPAL
 # =====================================================
-
 if st.session_state.data:
 
     st.title(f"📍 {turma}")
@@ -222,7 +178,7 @@ if st.session_state.data:
 
     for inicio in range(0, len(alunos), 5):
 
-        linha = alunos[inicio:inicio+5]
+        linha = alunos[inicio:inicio + 5]
 
         cols = st.columns(5)
 
@@ -232,26 +188,16 @@ if st.session_state.data:
 
             with cols[idx_col]:
 
+                st.image(
+                    f"data:image/png;base64,{aluno['img']}",
+                    use_container_width=True
+                )
+
                 st.markdown(
                     f"""
-                    <div class="student-card">
-
-                        <div class="photo-container">
-
-                            <img
-                                src="data:image/png;base64,{aluno['img']}"
-                                class="student-photo">
-
-                            <div class="student-number">
-                                {aluno['numero']}
-                            </div>
-
-                        </div>
-
-                        <div class="student-name">
-                            {aluno['nome']}
-                        </div>
-
+                    <div class="aluno-info">
+                        <b>{aluno['numero']}</b><br>
+                        {aluno['nome']}
                     </div>
                     """,
                     unsafe_allow_html=True
@@ -261,7 +207,7 @@ if st.session_state.data:
                     st.session_state.swap == indice_real
                 )
 
-                texto = "✓" if selecionado else "↔"
+                texto = "✅" if selecionado else "↔"
 
                 if st.button(
                     texto,
@@ -277,11 +223,14 @@ if st.session_state.data:
                         a = st.session_state.swap
                         b = indice_real
 
-                        st.session_state.data[a], st.session_state.data[b] = (
-                            st.session_state.data[b],
-                            st.session_state.data[a]
+                        dados = st.session_state.data.copy()
+
+                        dados[a], dados[b] = (
+                            dados[b],
+                            dados[a]
                         )
 
+                        st.session_state.data = dados
                         st.session_state.swap = None
 
                     st.rerun()
