@@ -9,95 +9,129 @@ st.set_page_config(
     initial_sidebar_state="collapsed"
 )
 
-# =====================================================
-# CSS
-# =====================================================
 st.markdown("""
 <style>
 
-/* Remove espaços excessivos */
+/* Remove margens */
 .block-container{
-    padding-top:0.5rem;
-    padding-bottom:0.5rem;
-    max-width:100% !important;
+    padding-top:0.3rem;
+    padding-left:0.2rem;
+    padding-right:0.2rem;
+    max-width:100%;
 }
 
-/* Força 5 colunas */
+/* força 5 colunas */
 [data-testid="stHorizontalBlock"]{
-    display:flex !important;
-    flex-wrap:nowrap !important;
-    gap:0.15rem !important;
+    gap:2px !important;
 }
 
 [data-testid="column"]{
-    width:20% !important;
-    min-width:20% !important;
-    max-width:20% !important;
-    flex:0 0 20% !important;
+    padding:0 !important;
 }
 
-/* Imagens dos alunos */
+/* card */
+.student-card{
+    text-align:center;
+    padding:0;
+    margin:0;
+}
+
+.photo-container{
+    position:relative;
+}
+
 .student-photo{
     width:100%;
     aspect-ratio:1/1;
     object-fit:cover;
-    border-radius:8px;
+    border-radius:4px;
     border:1px solid #ddd;
     display:block;
 }
 
-/* Desktop */
-@media (min-width:769px){
+.student-number{
+    position:absolute;
+    top:1px;
+    left:1px;
 
-    .student-photo{
-        max-height:140px;
-    }
+    background:rgba(0,0,0,0.75);
+    color:white;
 
-    .student-name{
-        font-size:11px;
-    }
-
-    .student-btn button{
-        font-size:11px;
-    }
+    font-size:7px;
+    padding:0px 3px;
+    border-radius:2px;
 }
 
-/* Celular */
+.student-name{
+    font-size:7px;
+    line-height:1;
+    margin-top:1px;
+
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+}
+
+/* botão */
+.stButton > button{
+    width:100%;
+    height:18px !important;
+    min-height:18px !important;
+
+    padding:0 !important;
+    margin-top:1px !important;
+
+    font-size:8px !important;
+}
+
+/* celular */
 @media (max-width:768px){
 
-    .block-container{
-        padding-left:0.2rem !important;
-        padding-right:0.2rem !important;
-    }
-
     .student-photo{
-        max-height:75px;
+        max-height:58px;
     }
 
     .student-name{
-        font-size:8px;
-        line-height:1.05;
+        font-size:6px;
+    }
+
+    .student-number{
+        font-size:6px;
     }
 
     .stButton > button{
-        font-size:8px !important;
-        min-height:22px !important;
-        padding:0 !important;
+        height:16px !important;
+        min-height:16px !important;
+        font-size:7px !important;
     }
 }
 
-/* Botões */
-.stButton > button{
-    width:100%;
+/* desktop */
+@media (min-width:769px){
+
+    .student-photo{
+        max-height:120px;
+    }
+
+    .student-name{
+        font-size:10px;
+    }
+
+    .student-number{
+        font-size:9px;
+    }
 }
 
 </style>
 """, unsafe_allow_html=True)
 
+
 # =====================================================
 # FUNÇÕES
 # =====================================================
+
 def load_data(turno, turma):
+
     path = os.path.join("turmas", turno, turma)
 
     json_path = next(
@@ -136,17 +170,20 @@ def load_data(turno, turma):
 
 
 # =====================================================
-# SESSION STATE
+# SESSION
 # =====================================================
+
 if "swap" not in st.session_state:
     st.session_state.swap = None
 
 if "data" not in st.session_state:
     st.session_state.data = []
 
+
 # =====================================================
 # SIDEBAR
 # =====================================================
+
 turnos = []
 
 if os.path.exists("turmas"):
@@ -172,9 +209,11 @@ if turno:
         st.session_state.swap = None
         st.rerun()
 
+
 # =====================================================
-# TELA PRINCIPAL
+# GRID
 # =====================================================
+
 if st.session_state.data:
 
     st.title(f"📍 {turma}")
@@ -183,9 +222,9 @@ if st.session_state.data:
 
     for inicio in range(0, len(alunos), 5):
 
-        cols = st.columns(5)
-
         linha = alunos[inicio:inicio+5]
+
+        cols = st.columns(5)
 
         for idx_col, aluno in enumerate(linha):
 
@@ -195,22 +234,24 @@ if st.session_state.data:
 
                 st.markdown(
                     f"""
-                    <img
-                        src="data:image/png;base64,{aluno['img']}"
-                        class="student-photo">
-                    """,
-                    unsafe_allow_html=True
-                )
+                    <div class="student-card">
 
-                st.markdown(
-                    f"""
-                    <div class="student-name"
-                         style="
-                         text-align:center;
-                         margin-top:2px;
-                         margin-bottom:4px;">
-                        <b>{aluno['numero']}</b><br>
-                        {aluno['nome']}
+                        <div class="photo-container">
+
+                            <img
+                                src="data:image/png;base64,{aluno['img']}"
+                                class="student-photo">
+
+                            <div class="student-number">
+                                {aluno['numero']}
+                            </div>
+
+                        </div>
+
+                        <div class="student-name">
+                            {aluno['nome']}
+                        </div>
+
                     </div>
                     """,
                     unsafe_allow_html=True
@@ -236,10 +277,7 @@ if st.session_state.data:
                         a = st.session_state.swap
                         b = indice_real
 
-                        (
-                            st.session_state.data[a],
-                            st.session_state.data[b]
-                        ) = (
+                        st.session_state.data[a], st.session_state.data[b] = (
                             st.session_state.data[b],
                             st.session_state.data[a]
                         )
@@ -251,5 +289,5 @@ if st.session_state.data:
 else:
 
     st.info(
-        "Selecione um turno e uma turma na barra lateral para começar."
+        "Selecione um turno e uma turma na barra lateral."
     )
