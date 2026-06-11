@@ -1,4 +1,3 @@
-```python
 import streamlit as st
 import os
 import json
@@ -265,4 +264,3 @@ else:
     st.info(
         "Selecione um turno e uma turma na barra lateral."
     )
-```
