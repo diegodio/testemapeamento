@@ -10,67 +10,85 @@ st.set_page_config(
 )
 
 # =====================================================
-# CSS - FORÇA 5 COLUNAS MESMO NO CELULAR
+# CSS
 # =====================================================
 st.markdown("""
 <style>
 
-/* Container principal */
+/* Remove espaços excessivos */
 .block-container{
     padding-top:0.5rem;
     padding-bottom:0.5rem;
+    max-width:100% !important;
 }
 
-/* Força as linhas de colunas */
+/* Força 5 colunas */
 [data-testid="stHorizontalBlock"]{
     display:flex !important;
     flex-wrap:nowrap !important;
-    gap:0.2rem !important;
+    gap:0.15rem !important;
 }
 
-/* Força cada coluna a ocupar exatamente 20% */
 [data-testid="column"]{
-    min-width:20% !important;
     width:20% !important;
-    flex:0 0 20% !important;
+    min-width:20% !important;
     max-width:20% !important;
+    flex:0 0 20% !important;
 }
 
-/* Imagens */
-[data-testid="stImage"] img{
-    width:100% !important;
-    height:auto !important;
-}
-
-/* Botões */
-.stButton > button{
+/* Imagens dos alunos */
+.student-photo{
     width:100%;
-    padding:2px;
-    font-size:0.55rem;
-    min-height:28px;
+    aspect-ratio:1/1;
+    object-fit:cover;
+    border-radius:8px;
+    border:1px solid #ddd;
+    display:block;
 }
 
-/* Mobile */
+/* Desktop */
+@media (min-width:769px){
+
+    .student-photo{
+        max-height:140px;
+    }
+
+    .student-name{
+        font-size:11px;
+    }
+
+    .student-btn button{
+        font-size:11px;
+    }
+}
+
+/* Celular */
 @media (max-width:768px){
 
     .block-container{
         padding-left:0.2rem !important;
         padding-right:0.2rem !important;
-        max-width:100% !important;
     }
 
-    [data-testid="column"]{
-        min-width:20% !important;
-        width:20% !important;
-        flex:0 0 20% !important;
-        max-width:20% !important;
+    .student-photo{
+        max-height:75px;
+    }
+
+    .student-name{
+        font-size:8px;
+        line-height:1.05;
     }
 
     .stButton > button{
-        font-size:0.45rem !important;
-        padding:1px !important;
-        min-height:24px !important;
+        font-size:8px !important;
+        min-height:22px !important;
+        padding:0 !important;
     }
+}
+
+/* Botões */
+.stButton > button{
+    width:100%;
 }
 
 </style>
@@ -91,29 +109,28 @@ def load_data(turno, turma):
         None
     )
 
-    name_map = (
-        json.load(open(json_path, "r", encoding="utf-8"))
-        if json_path
-        else {}
-    )
+    name_map = {}
+
+    if json_path:
+        with open(json_path, "r", encoding="utf-8") as f:
+            name_map = json.load(f)
 
     students = []
 
     for file in os.listdir(path):
-        name, ext = os.path.splitext(file)
 
-        if ext.lower() in [".jpg", ".jpeg", ".png"] and name.isdigit():
+        nome, ext = os.path.splitext(file)
+
+        if ext.lower() in [".jpg", ".jpeg", ".png"] and nome.isdigit():
 
             with open(os.path.join(path, file), "rb") as f:
                 img_b64 = base64.b64encode(f.read()).decode()
 
-            students.append(
-                {
-                    "numero": name,
-                    "nome": name_map.get(name, "---"),
-                    "img": img_b64
-                }
-            )
+            students.append({
+                "numero": nome,
+                "nome": name_map.get(nome, "---"),
+                "img": img_b64
+            })
 
     return sorted(students, key=lambda x: int(x["numero"]))
 
@@ -156,7 +173,7 @@ if turno:
         st.rerun()
 
 # =====================================================
-# INTERFACE
+# TELA PRINCIPAL
 # =====================================================
 if st.session_state.data:
 
@@ -166,9 +183,9 @@ if st.session_state.data:
 
     for inicio in range(0, len(alunos), 5):
 
-        linha = alunos[inicio:inicio + 5]
-
         cols = st.columns(5)
+
+        linha = alunos[inicio:inicio+5]
 
         for idx_col, aluno in enumerate(linha):
 
@@ -176,20 +193,22 @@ if st.session_state.data:
 
             with cols[idx_col]:
 
-                st.image(
-                    f"data:image/png;base64,{aluno['img']}",
-                    use_container_width=True
+                st.markdown(
+                    f"""
+                    <img
+                        src="data:image/png;base64,{aluno['img']}"
+                        class="student-photo">
+                    """,
+                    unsafe_allow_html=True
                 )
 
                 st.markdown(
                     f"""
-                    <div style="
-                        text-align:center;
-                        font-size:10px;
-                        line-height:1.1;
-                        margin-top:2px;
-                        margin-bottom:4px;
-                    ">
+                    <div class="student-name"
+                         style="
+                         text-align:center;
+                         margin-top:2px;
+                         margin-bottom:4px;">
                         <b>{aluno['numero']}</b><br>
                         {aluno['nome']}
                     </div>
@@ -201,30 +220,33 @@ if st.session_state.data:
                     st.session_state.swap == indice_real
                 )
 
-                texto_botao = "✓" if selecionado else "↔"
+                texto = "✓" if selecionado else "↔"
 
                 if st.button(
-                    texto_botao,
+                    texto,
                     key=f"btn_{indice_real}"
                 ):
 
                     if st.session_state.swap is None:
 
                         st.session_state.swap = indice_real
-                        st.rerun()
 
                     else:
 
                         a = st.session_state.swap
                         b = indice_real
 
-                        st.session_state.data[a], st.session_state.data[b] = (
+                        (
+                            st.session_state.data[a],
+                            st.session_state.data[b]
+                        ) = (
                             st.session_state.data[b],
                             st.session_state.data[a]
                         )
 
                         st.session_state.swap = None
-                        st.rerun()
+
+                    st.rerun()
 
 else:
 
