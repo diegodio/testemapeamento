@@ -37,7 +37,7 @@ header[data-testid="stHeader"] {
     background: transparent;
 }
 
-#MainMenu, footer { visibility: hidden; }
+#MainMenu, footer { visibility: visible; }
 
 /* Remove os botões do Streamlit no canto superior direito (Deploy, menu, status) */
 div[data-testid="stToolbar"],
@@ -347,6 +347,19 @@ div[data-testid="stColumn"] div[data-testid="stVerticalBlock"]:has(div.stButton 
     .carteira-vazia { border-radius: 11px; font-size: .6rem; }
 
     .mesa-professor { font-size: .72rem; padding: .75rem .6rem; letter-spacing: .1em; }
+}
+
+/* Setas de recolher/expandir a sidebar sempre visíveis */
+[data-testid="stSidebarCollapseButton"],
+[data-testid="stSidebarCollapsedControl"],
+[data-testid="stExpandSidebarButton"] {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+[data-testid="stSidebarCollapseButton"] button,
+[data-testid="stExpandSidebarButton"] button {
+    color: #D4A017 !important;
 }
 </style>
 """
