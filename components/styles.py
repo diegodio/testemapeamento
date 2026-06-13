@@ -46,9 +46,6 @@ div[data-testid="stStatusWidget"] {
     display: block !important;
 }
 
-div[data-testid="stToolbarActionButtonLabel"] {
-    display: none !important;
-}
 
 
 
