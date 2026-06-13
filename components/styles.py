@@ -43,7 +43,7 @@ header[data-testid="stHeader"] {
 div[data-testid="stToolbar"],
 div[data-testid="stDecoration"],
 div[data-testid="stStatusWidget"] {
-    display: none !important;
+    display: block !important;
 }
 
 .block-container {
@@ -361,6 +361,8 @@ div[data-testid="stColumn"] div[data-testid="stVerticalBlock"]:has(div.stButton 
 [data-testid="stExpandSidebarButton"] button {
     color: #D4A017 !important;
 }
+
+
 </style>
 """
 
