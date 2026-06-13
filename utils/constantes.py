@@ -1,6 +1,6 @@
 """Constantes globais do sistema."""
 
-# Quantidade padrão de alunos por fila na geração automática do mapeamento
+# Quantidade de carteiras por fila (profundidade de cada fila) na geração automática
 ALUNOS_POR_FILA = 5
 
 # Extensões de imagem aceitas (a busca é case-insensitive)

@@ -1,4 +1,9 @@
-"""Renderização da sala: grade de carteiras, mesa do professor e porta."""
+"""Renderização da sala: grade de carteiras, mesa do professor e porta.
+
+Orientação: cada fila é uma coluna de carteiras. A posição 1 é a carteira
+da frente (mais próxima da mesa do professor, exibida abaixo do mapeamento);
+portanto a primeira linha da tela corresponde às últimas carteiras de cada fila.
+"""
 
 import streamlit as st
 
@@ -15,7 +20,7 @@ from utils import paths
 
 
 def _ao_clicar(pos: Posicao, turno: str, turma: str) -> None:
-    """Callback dos botões: seleciona, desseleciona ou troca + salva."""
+    """Callback do botão de seleção: seleciona, desseleciona ou troca + salva."""
     selecionado: Posicao | None = st.session_state.get("selecionado")
     mapa = st.session_state["mapa"]
 
@@ -41,15 +46,12 @@ def render_sala(turno: str, turma: str, numero_por_nome: dict[str, str]) -> None
         st.info("Nenhum aluno mapeado nesta turma.")
         return
 
-    for fila in filas:
-        st.markdown(
-            f'<div class="rotulo-fila">Fila {fila}</div>',
-            unsafe_allow_html=True,
-        )
-        colunas = st.columns(max_posicao, gap="small")
-        for indice in range(1, max_posicao + 1):
-            pos = (fila, indice)
-            with colunas[indice - 1]:
+    # Da última carteira (fundo da sala, topo da tela) até a primeira (frente)
+    for posicao_na_fila in range(max_posicao, 0, -1):
+        colunas = st.columns(len(filas), gap="small")
+        for indice, fila in enumerate(filas):
+            pos = (fila, posicao_na_fila)
+            with colunas[indice]:
                 if pos not in mapa:
                     st.markdown(html_carteira_vazia(), unsafe_allow_html=True)
                     continue
@@ -63,15 +65,12 @@ def render_sala(turno: str, turma: str, numero_por_nome: dict[str, str]) -> None
                     html_card_aluno(nome, numero, foto, esta_selecionado),
                     unsafe_allow_html=True,
                 )
-                rotulo = "✕ Cancelar" if esta_selecionado else (
-                    "⇄ Trocar" if selecionado is not None else "Selecionar"
-                )
                 st.button(
-                    rotulo,
-                    key=f"sel_{fila}_{indice}",
+                    "✕" if esta_selecionado else "⇄",
+                    key=f"sel_{fila}_{posicao_na_fila}",
                     on_click=_ao_clicar,
                     args=(pos, turno, turma),
-                    use_container_width=True,
+                    help="Cancelar seleção" if esta_selecionado else "Selecionar para troca",
                 )
 
     st.markdown(html_mesa_professor(), unsafe_allow_html=True)

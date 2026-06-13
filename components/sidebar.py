@@ -1,4 +1,4 @@
-"""Sidebar: seleção de turno e turma + ações da turma."""
+"""Sidebar: seleção de turno e turma."""
 
 import streamlit as st
 
@@ -45,11 +45,8 @@ def render_sidebar() -> tuple[str | None, str | None]:
 
         st.divider()
         st.caption(
-            "Toque em **Selecionar** em um aluno e depois em outro "
+            "Toque no botão **⇄** de um aluno e depois no de outro "
             "para trocá-los de lugar. A troca é salva automaticamente."
         )
-
-        if st.button("↺ Refazer distribuição automática", use_container_width=True):
-            st.session_state["redistribuir"] = True
 
     return turno, turma

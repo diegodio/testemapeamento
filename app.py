@@ -11,8 +11,7 @@ from components.layout_sala import render_sala
 from components.sidebar import render_sidebar
 from components.styles import aplicar_estilos
 from services.arquivos import carregar_alunos
-from services.mapeamento import carregar_ou_gerar, gerar_mapeamento_inicial
-from services.persistencia import salvar_mapeamento
+from services.mapeamento import carregar_ou_gerar
 from utils.constantes import ROTULOS_TURNOS
 
 st.set_page_config(
@@ -31,10 +30,12 @@ if turno is None or turma is None:
         """
         <div class="faixa-titulo">
             <div class="brasao">🏫</div>
-            <div>
+            <div class="bloco-titulo">
                 <p class="titulo-app">Mapa da <span class="destaque">Sala</span></p>
-                <p class="subtitulo-app">Crie a estrutura de pastas em
-                <code>dados/&lt;turno&gt;/&lt;turma&gt;/alunos.json</code> para começar.</p>
+                <div class="linha-meta">
+                    <span class="meta-info">Crie a estrutura em
+                    <code>dados/&lt;turno&gt;/&lt;turma&gt;/alunos.json</code> para começar.</span>
+                </div>
             </div>
         </div>
         """,
@@ -57,13 +58,6 @@ if st.session_state.get("contexto") != contexto:
     st.session_state["mapa"] = carregar_ou_gerar(turno, turma, alunos)
     st.session_state["selecionado"] = None
 
-# Ação da sidebar: refazer a distribuição automática
-if st.session_state.pop("redistribuir", False):
-    st.session_state["mapa"] = gerar_mapeamento_inicial(alunos)
-    salvar_mapeamento(turno, turma, st.session_state["mapa"])
-    st.session_state["selecionado"] = None
-    st.toast("Distribuição automática refeita e salva.", icon="↺")
-
 # Feedback da última troca (definida no callback dos botões)
 ultima_troca = st.session_state.pop("ultima_troca", None)
 if ultima_troca:
@@ -75,9 +69,12 @@ st.markdown(
     f"""
     <div class="faixa-titulo">
         <div class="brasao">🏫</div>
-        <div>
-            <p class="titulo-app">Turma <span class="destaque">{turma}</span> · {rotulo_turno}</p>
-            <p class="subtitulo-app">{len(alunos)} alunos · toque em dois cards para trocar de lugar</p>
+        <div class="bloco-titulo">
+            <p class="titulo-app">Turma <span class="destaque">{turma}</span></p>
+            <div class="linha-meta">
+                <span class="pill-turno">☀ {rotulo_turno}</span>
+                <span class="meta-info">{len(alunos)} alunos · toque em ⇄ para trocar lugares</span>
+            </div>
         </div>
     </div>
     """,

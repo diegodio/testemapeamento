@@ -26,18 +26,16 @@ dados/
 ```
 
 - Se `mapeamento.json` não existir, o sistema distribui os alunos automaticamente
-  (5 por fila, em ordem de chamada) e salva o arquivo.
+  (5 carteiras por fila, em ordem de chamada — a posição 1 é a carteira da frente, junto à mesa do professor) e salva o arquivo.
 - Fotos aceitas: `.jpg`, `.jpeg`, `.png`, `.webp`, `.bmp` (qualquer caixa).
   Sem foto, é exibido o avatar padrão.
 
 ## Como trocar alunos de lugar
 
-1. Toque em **Selecionar** no card do primeiro aluno (ele ganha borda dourada).
-2. Toque em **⇄ Trocar** no card do segundo aluno.
+1. Toque no botão **⇄** no canto do card do primeiro aluno (ele ganha borda dourada).
+2. Toque no **⇄** do segundo aluno.
 3. A troca acontece e é salva automaticamente em `mapeamento.json`.
 
-Para voltar à distribuição por ordem de chamada, use **↺ Refazer distribuição
-automática** na sidebar.
 
 ## Arquitetura
 
