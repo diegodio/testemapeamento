@@ -39,6 +39,13 @@ header[data-testid="stHeader"] {
 
 #MainMenu, footer { visibility: hidden; }
 
+/* Remove os botões do Streamlit no canto superior direito (Deploy, menu, status) */
+div[data-testid="stToolbar"],
+div[data-testid="stDecoration"],
+div[data-testid="stStatusWidget"] {
+    display: none !important;
+}
+
 .block-container {
     padding-top: 1.4rem;
     padding-bottom: 2.5rem;
@@ -131,6 +138,14 @@ div[data-baseweb="popover"] li { background: var(--superficie); }
     font-size: .85rem;
 }
 
+/* Área reservada para o aviso de troca — a página não "pula" quando ele aparece/some */
+.area-status {
+    min-height: 2.6rem;
+    display: flex;
+    align-items: center;
+    margin-bottom: .6rem;
+}
+
 .chip-status {
     display: inline-flex;
     align-items: center;
@@ -142,7 +157,6 @@ div[data-baseweb="popover"] li { background: var(--superficie); }
     padding: .3rem .8rem;
     font-size: .78rem;
     font-weight: 600;
-    margin-bottom: .9rem;
 }
 
 /* ---------- Cards de aluno ---------- */
@@ -181,15 +195,18 @@ div[data-baseweb="popover"] li { background: var(--superficie); }
     position: absolute;
     top: .8rem; left: .8rem;
     z-index: 5;
+    width: 32px; height: 32px;
+    display: grid;
+    place-items: center;
     background: rgba(11,31,58,.82);
     backdrop-filter: blur(3px);
     color: var(--dourado);
-    font-size: .68rem;
+    font-size: .76rem;
     font-weight: 700;
-    padding: .1rem .42rem;
-    border-radius: 8px;
+    border-radius: 50%;
     border: 1px solid rgba(212,160,23,.55);
-    line-height: 1.3;
+    box-shadow: 0 4px 10px rgba(0,0,0,.4);
+    line-height: 1;
 }
 
 .card-nome {
@@ -216,40 +233,46 @@ div[data-baseweb="popover"] li { background: var(--superficie); }
     font-weight: 500;
 }
 
-/* ---------- Botão de seleção no canto do card ---------- */
+/* ---------- Card inteiro como gatilho de troca ----------
+   O st.button é invisível e esticado sobre o card inteiro. */
 div[data-testid="stColumn"] { position: relative; }
 
 div[data-testid="stColumn"] div[data-testid="stElementContainer"]:has(> div.stButton) {
     position: absolute;
-    top: .85rem; right: .85rem;
-    width: auto !important;
+    inset: 0;
+    width: 100% !important;
     z-index: 10;
     margin: 0;
 }
+div[data-testid="stColumn"] div.stButton,
 div[data-testid="stColumn"] div.stButton > button {
-    width: 32px; height: 32px;
-    min-height: 32px;
+    width: 100%;
+    height: 100%;
+}
+div[data-testid="stColumn"] div.stButton > button {
+    min-height: 0;
     padding: 0;
-    border-radius: 50%;
-    font-size: .85rem;
-    line-height: 1;
-    background: rgba(11,31,58,.82);
-    backdrop-filter: blur(3px);
-    color: var(--cinza-claro);
-    border: 1px solid rgba(79,134,198,.55);
-    box-shadow: 0 4px 10px rgba(0,0,0,.4);
-    transition: all .15s ease;
+    background: transparent !important;
+    border: none !important;
+    color: transparent !important;
+    box-shadow: none !important;
+    cursor: pointer;
+    border-radius: var(--raio);
 }
-div[data-testid="stColumn"] div.stButton > button:hover {
-    background: rgba(212,160,23,.2);
-    color: var(--dourado);
-    border-color: var(--dourado);
-    transform: scale(1.08);
+div[data-testid="stColumn"] div.stButton > button:focus-visible {
+    outline: 2px solid var(--dourado);
+    outline-offset: 2px;
 }
-div[data-testid="stColumn"] div.stButton > button:focus:not(:active) {
+
+/* Hover do card mesmo com o botão por cima */
+div[data-testid="stColumn"] div[data-testid="stVerticalBlock"]:has(div.stButton > button:hover) .card-aluno {
+    transform: translateY(-3px);
+    border-color: var(--azul-claro);
+    box-shadow: 0 12px 26px rgba(0,0,0,.38);
+}
+div[data-testid="stColumn"] div[data-testid="stVerticalBlock"]:has(div.stButton > button:hover) .card-aluno.selecionado {
     border-color: var(--dourado);
-    color: var(--dourado);
-    box-shadow: 0 0 0 3px rgba(212,160,23,.25);
+    box-shadow: 0 0 0 4px rgba(212,160,23,.22), 0 14px 30px rgba(0,0,0,.5);
 }
 
 /* ---------- Mesa do professor e porta ---------- */
@@ -320,15 +343,8 @@ div[data-testid="stColumn"] div.stButton > button:focus:not(:active) {
     .card-aluno { padding: .3rem .3rem .4rem; border-radius: 11px; }
     .card-foto img { border-radius: 8px; }
     .card-nome { font-size: .62rem; margin-top: .3rem; }
-    .card-num-badge { top: .55rem; left: .55rem; font-size: .56rem; padding: .06rem .3rem; }
+    .card-num-badge { top: .5rem; left: .5rem; width: 20px; height: 20px; font-size: .56rem; }
     .carteira-vazia { border-radius: 11px; font-size: .6rem; }
-
-    div[data-testid="stColumn"] div[data-testid="stElementContainer"]:has(> div.stButton) {
-        top: .55rem; right: .55rem;
-    }
-    div[data-testid="stColumn"] div.stButton > button {
-        width: 24px; height: 24px; min-height: 24px; font-size: .66rem;
-    }
 
     .mesa-professor { font-size: .72rem; padding: .75rem .6rem; letter-spacing: .1em; }
 }

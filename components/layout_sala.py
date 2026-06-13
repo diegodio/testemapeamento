@@ -65,12 +65,13 @@ def render_sala(turno: str, turma: str, numero_por_nome: dict[str, str]) -> None
                     html_card_aluno(nome, numero, foto, esta_selecionado),
                     unsafe_allow_html=True,
                 )
+                # Botão invisível que cobre o card inteiro (estilizado no CSS):
+                # o card todo funciona como gatilho de seleção/troca.
                 st.button(
-                    "✕" if esta_selecionado else "⇄",
+                    "⇄",
                     key=f"sel_{fila}_{posicao_na_fila}",
                     on_click=_ao_clicar,
                     args=(pos, turno, turma),
-                    help="Cancelar seleção" if esta_selecionado else "Selecionar para troca",
                 )
 
     st.markdown(html_mesa_professor(), unsafe_allow_html=True)

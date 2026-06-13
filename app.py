@@ -73,7 +73,7 @@ st.markdown(
             <p class="titulo-app">Turma <span class="destaque">{turma}</span></p>
             <div class="linha-meta">
                 <span class="pill-turno">☀ {rotulo_turno}</span>
-                <span class="meta-info">{len(alunos)} alunos · toque em ⇄ para trocar lugares</span>
+                <span class="meta-info">{len(alunos)} alunos · toque em dois cards para trocar lugares</span>
             </div>
         </div>
     </div>
@@ -84,11 +84,18 @@ st.markdown(
 selecionado = st.session_state.get("selecionado")
 if selecionado is not None:
     nome_sel = st.session_state["mapa"].get(selecionado, "")
-    st.markdown(
+    conteudo_status = (
         f'<div class="chip-status">⇄ Trocando: <strong>{nome_sel}</strong>'
-        " — escolha a outra carteira</div>",
-        unsafe_allow_html=True,
+        " — escolha a outra carteira</div>"
     )
+else:
+    conteudo_status = ""
+
+# A área é sempre renderizada (altura reservada) para a página não "pular"
+st.markdown(
+    f'<div class="area-status">{conteudo_status}</div>',
+    unsafe_allow_html=True,
+)
 
 # ---------- Sala ----------
 render_sala(turno, turma, numero_por_nome)

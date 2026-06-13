@@ -45,7 +45,7 @@ def render_sidebar() -> tuple[str | None, str | None]:
 
         st.divider()
         st.caption(
-            "Toque no botão **⇄** de um aluno e depois no de outro "
+            "Toque no card de um aluno e depois no de outro "
             "para trocá-los de lugar. A troca é salva automaticamente."
         )
 

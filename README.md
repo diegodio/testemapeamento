@@ -32,8 +32,8 @@ dados/
 
 ## Como trocar alunos de lugar
 
-1. Toque no botão **⇄** no canto do card do primeiro aluno (ele ganha borda dourada).
-2. Toque no **⇄** do segundo aluno.
+1. Toque no card do primeiro aluno (ele ganha borda dourada).
+2. Toque no card do segundo aluno.
 3. A troca acontece e é salva automaticamente em `mapeamento.json`.
 
 
