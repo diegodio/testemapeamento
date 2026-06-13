@@ -46,6 +46,17 @@ div[data-testid="stStatusWidget"] {
     display: block !important;
 }
 
+div[data-testid="stToolbarActionButtonLabel"] {
+    display: none !important;
+}
+
+
+
+
+
+
+
+
 .block-container {
     padding-top: 1.4rem;
     padding-bottom: 2.5rem;
