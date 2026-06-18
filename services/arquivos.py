@@ -34,3 +34,11 @@ def carregar_alunos(turno: str, turma: str) -> dict[str, str]:
     with arquivo.open(encoding="utf-8") as f:
         dados = json.load(f)
     return {str(k).strip(): str(k).strip() for k in dados if str(k).strip()}
+
+def carregar_info(turno: str, turma: str) -> dict[str, dict]:
+    """Carrega info.json -> {nome: {numero, posicao}}."""
+    arquivo = paths.pasta_turno(turno) / turma / "info.json"
+    if not arquivo.is_file():
+        return {}
+    with arquivo.open(encoding="utf-8") as f:
+        return json.load(f)
