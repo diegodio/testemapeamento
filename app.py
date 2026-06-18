@@ -8,6 +8,7 @@ from components.layout_sala import render_sala
 from components.sidebar import render_sidebar
 from components.styles import aplicar_estilos
 from services.arquivos import carregar_alunos
+from services.arquivos import carregar_info
 from services.mapeamento import carregar_ou_gerar
 from utils.constantes import ROTULOS_TURNOS
 
