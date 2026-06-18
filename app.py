@@ -47,7 +47,8 @@ if not alunos:
     st.stop()
 
 # Índice inverso nome -> número da chamada (para exibição do Nº no badge)
-numero_por_nome = {nome: numero for numero, nome in alunos.items()}
+info = carregar_info(turno, turma)
+numero_por_nome = {nome: str(dados["numero"]) for nome, dados in info.items()}
 
 # Recarrega o estado quando o usuário muda de turno/turma
 contexto = (turno, turma)
