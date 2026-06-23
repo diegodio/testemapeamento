@@ -35,12 +35,12 @@
   "DAVI LOTZ TAVARES": {"numero": 32, "posicao": "(7,4)"},
   "ANELISE GERALDA RIBEIRO DE MOURA": {"numero": 33, "posicao": "(8,4)"}
 
-  "__VAZIO_1__": {"numero": null, "posicao": "(1,5)"},
-  "__VAZIO_2__": {"numero": null, "posicao": "(2,5)"},
-  "__VAZIO_3__": {"numero": null, "posicao": "(3,5)"},
-  "__VAZIO_4__": {"numero": null, "posicao": "(4,5)"},
-  "__VAZIO_5__": {"numero": null, "posicao": "(5,5)"},
-  "__VAZIO_6__": {"numero": null, "posicao": "(6,5)"},
-  "__VAZIO_7__": {"numero": null, "posicao": "(7,5)"},
-  "__VAZIO_8__": {"numero": null, "posicao": "(8,5)"}
+  "__VAZIO_1__": {"numero": None, "posicao": "(1,5)"},
+  "__VAZIO_2__": {"numero": None, "posicao": "(2,5)"},
+  "__VAZIO_3__": {"numero": None, "posicao": "(3,5)"},
+  "__VAZIO_4__": {"numero": None, "posicao": "(4,5)"},
+  "__VAZIO_5__": {"numero": None, "posicao": "(5,5)"},
+  "__VAZIO_6__": {"numero": None, "posicao": "(6,5)"},
+  "__VAZIO_7__": {"numero": None, "posicao": "(7,5)"},
+  "__VAZIO_8__": {"numero": None, "posicao": "(8,5)"}
 }
