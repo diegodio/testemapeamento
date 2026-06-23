@@ -1,7 +1,7 @@
 """Constantes globais do sistema."""
 
 # Quantidade de carteiras por fila (profundidade de cada fila) na geração automática
-ALUNOS_POR_FILA = 5
+ALUNOS_POR_FILA = 8
 
 # Extensões de imagem aceitas (a busca é case-insensitive)
 EXTENSOES_IMAGEM = (".jpg", ".jpeg", ".png", ".webp", ".bmp")
